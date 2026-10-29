@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishShift — AI-Powered Message Risk Scanner</title>
+    <meta name="description" content="Identify legitimate, spam, and phishing messages with AI-powered TF-IDF machine learning, URL forensics, and heuristic security indicators.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Favicon / Shield SVG -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 9.01-7 10.15-3.87-1.14-7-5.48-7-10.15V6.3l7-3.12z'/></svg>">
+</head>
+<body>
+    <!-- Background Ambient Glow Effects -->
+    <div class="ambient-glow glow-top-left" aria-hidden="true"></div>
+    <div class="ambient-glow glow-bottom-right" aria-hidden="true"></div>
+    <div class="ambient-grid" aria-hidden="true"></div>
+
+    <!-- Navigation Header -->
+    <header class="site-header" id="site-header">
+        <div class="container nav-container">
+            <a href="#home" class="brand-logo" id="brand-logo" aria-label="PhishShift Home">
+                <div class="logo-icon-wrapper">
+                    <svg class="shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="m9 12 2 2 4-4" stroke="#00f2fe" stroke-width="2.5"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Phish<span class="highlight">Shift</span></span>
+                    <span class="brand-tag">Risk Scanner</span>
+                </div>
+            </a>
+
+            <nav class="nav-menu" id="nav-menu" aria-label="Main Navigation">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#scanner" class="nav-link">Scanner</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="#architecture" class="nav-link">Architecture</a>
+                <a href="#privacy" class="nav-link">Privacy</a>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="system-status-pill" id="system-status-pill" title="Checking server status...">
+                    <span class="status-dot"></span>
+                    <span class="status-label" id="status-label">Checking Model...</span>
+                </div>
+                <a href="#scanner" class="btn btn-primary btn-sm nav-cta" id="nav-scan-cta">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span>Scan Message</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section" id="home">
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <div class="badge-pill hero-badge">
+                        <span class="badge-dot"></span>
+                        <span>AI-Powered SMS & Message Threat Defense</span>
+                    </div>
+                    <h1 class="hero-title">
+                        Detect Suspicious Messages <span class="gradient-text">Before They Become Threats.</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Analyze suspicious SMS messages, text alerts, and urgent communications instantly.
+                        PhishShift couples a machine learning classification model with static URL forensics
+                        and heuristic threat indicators to provide transparent, multi-layered risk intelligence.
+                    </p>
+                    <div class="hero-ctas">
+                        <a href="#scanner" class="btn btn-primary btn-lg" id="hero-scan-btn">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                            <span>Scan a Message</span>
+                        </a>
+                        <a href="#how-it-works" class="btn btn-secondary btn-lg" id="hero-how-btn">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 14 14"></polyline>
+                            </svg>
+                            <span>How It Works</span>
+                        </a>
+                    </div>
+                    <!-- Trust / Feature Indicators -->
+                    <div class="hero-metrics">
+                        <div class="metric-item">
+                            <span class="metric-val">96.6%</span>
+                            <span class="metric-lbl">SMS Test Accuracy</span>
+                        </div>
+                        <div class="metric-divider"></div>
+                        <div class="metric-item">
+                            <span class="metric-val">3-Class</span>
+                            <span class="metric-lbl">Legit • Spam • Phish</span>
+                        </div>
+                        <div class="metric-divider"></div>
+                        <div class="metric-item">
+                            <span class="metric-val">Zero</span>
+                            <span class="metric-lbl">Message Storage</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cybersecurity Visual / Hero Radar Shield Graphic -->
+                <div class="hero-graphic-wrapper" aria-hidden="true">
+                    <div class="cyber-radar-card">
+                        <div class="radar-circle circle-outer"></div>
+                        <div class="radar-circle circle-mid"></div>
+                        <div class="radar-circle circle-inner"></div>
+                        <div class="radar-sweep"></div>
+                        <div class="radar-center-shield">
+                            <svg viewBox="0 0 24 24" class="radar-shield-svg" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <path d="m9 12 2 2 4-4" stroke="#00f2fe" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <!-- Floating threat alerts for visual depth -->
+                        <div class="floating-badge badge-threat">
+                            <span class="indicator-dot dot-red"></span>
+                            <span>Phishing Link Blocked</span>
+                        </div>
+                        <div class="floating-badge badge-safe">
+                            <span class="indicator-dot dot-green"></span>
+                            <span>TF-IDF Vector Verified</span>
+                        </div>
+                        <div class="floating-badge badge-indicator">
+                            <span class="indicator-dot dot-cyan"></span>
+                            <span>Heuristic Radar Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Message Scanner Section -->
+        <section class="scanner-section" id="scanner">
+            <div class="container">
+                <div class="section-header text-center">
+                    <h2 class="section-title">Message Threat Scanner</h2>
+                    <p class="section-description">
+                        Paste any suspicious SMS, text notification, or incoming message to evaluate its risk score,
+                        extracted URL attributes, and heuristic warning indicators.
+                    </p>
+                </div>
+
+                <!-- Main Scanner Card -->
+                <div class="scanner-card glass-panel" id="scanner-card">
+                    <div class="scanner-top-bar">
+                        <div class="sample-pills-label">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                            <span>Quick Demonstration Samples:</span>
+                        </div>
+                        <div class="sample-pills" role="group" aria-label="Sample message options">
+                            <button type="button" class="sample-btn" id="sample-phishing" data-sample="phishing">
+                                <span class="dot dot-red"></span> Phishing Bank Alert
+                            </button>
+                            <button type="button" class="sample-btn" id="sample-package" data-sample="package">
+                                <span class="dot dot-red"></span> Delivery Phish
+                            </button>
+                            <button type="button" class="sample-btn" id="sample-spam" data-sample="spam">
+                                <span class="dot dot-yellow"></span> Prize Spam
+                            </button>
+                            <button type="button" class="sample-btn" id="sample-legit" data-sample="legitimate">
+                                <span class="dot dot-green"></span> Legitimate SMS
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Message Input Form -->
+                    <form id="scanner-form" class="scanner-form" novalidate>
+                        <div class="input-container">
+                            <label for="message-input" class="sr-only">Message text to analyze</label>
+                            <textarea
+                                id="message-input"
+                                name="message"
+                                class="message-textarea"
+                                placeholder="Paste an SMS message, text notification, or suspicious message here (e.g., 'URGENT: Your account has been suspended. Verify immediately at http://192.168.1.1/login')..."
+                                rows="6"
+                                maxlength="10000"
+                                required
+                                spellcheck="false"
+                            ></textarea>
+                        </div>
+
+                        <!-- Live Metrics Bar -->
+                        <div class="textarea-metrics-bar">
+                            <div class="metrics-left">
+                                <span class="stat-item" id="char-counter">0 / 10,000 characters</span>
+                                <span class="stat-separator">•</span>
+                                <span class="stat-item" id="word-counter">0 words</span>
+                            </div>
+                            <div class="metrics-right">
+                                <span class="privacy-note-badge" title="Messages are evaluated in-memory and never stored.">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                    Zero Retention
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Scanner Controls -->
+                        <div class="scanner-actions">
+                            <button type="button" class="btn btn-ghost" id="clear-message-btn" aria-label="Clear input message">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                                <span>Clear</span>
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-analyze" id="analyze-btn">
+                                <svg class="btn-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <span class="btn-text">Analyze Message</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Dynamic Error Alert Box -->
+                    <div class="alert-box alert-error hidden" id="scanner-error" role="alert" aria-live="polite">
+                        <div class="alert-icon">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                        <div class="alert-content">
+                            <strong class="alert-title">Analysis Error</strong>
+                            <p class="alert-message" id="scanner-error-text">Please enter a message before scanning.</p>
+                        </div>
+                        <button type="button" class="alert-dismiss" id="error-dismiss" aria-label="Dismiss error">×</button>
+                    </div>
+
+                    <!-- Scanning Progress Animation -->
+                    <div class="scanning-loader-container hidden" id="scanning-loader" aria-live="polite">
+                        <div class="scanning-radar-line"></div>
+                        <div class="scanning-status-wrapper">
+                            <div class="scanning-spinner"></div>
+                            <div class="scanning-info">
+                                <span class="scanning-title">Scanning Message Content...</span>
+                                <span class="scanning-step" id="scanning-step-text">Evaluating TF-IDF vectors against ML pipeline...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Dashboard -->
+                <div class="results-dashboard hidden" id="results-dashboard" aria-live="polite">
+                    <div class="results-header">
+                        <div class="results-header-info">
+                            <span class="results-label">Security Scan Report</span>
+                            <span class="results-meta" id="results-meta-timestamp">Scanned in 24ms</span>
+                        </div>
+                        <div class="results-header-actions">
+                            <button type="button" class="btn btn-secondary btn-sm" id="copy-report-btn">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span id="copy-report-text">Copy Summary</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Top Grid: Prediction Verdict & Heuristic Gauge -->
+                    <div class="results-grid-top">
+                        <!-- Card 1: Primary Verdict & Risk Score -->
+                        <div class="result-card verdict-card glass-panel" id="card-verdict">
+                            <div class="card-eyebrow">Threat Classification</div>
+                            <div class="verdict-primary-row">
+                                <div class="verdict-badge-box">
+                                    <div class="category-badge badge-phishing" id="verdict-category-badge">
+                                        <span class="category-icon" id="verdict-icon">⚠️</span>
+                                        <span class="category-text" id="verdict-category">Phishing</span>
+                                    </div>
+                                    <div class="risk-level-tag level-high" id="verdict-risk-level">
+                                        Risk Level: <strong>High</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Radial Heuristic Risk Gauge -->
+                                <div class="radial-gauge-wrapper">
+                                    <div class="gauge-svg-container">
+                                        <svg class="radial-gauge" viewBox="0 0 120 120" width="120" height="120">
+                                            <circle class="gauge-bg" cx="60" cy="60" r="50"></circle>
+                                            <circle class="gauge-progress gauge-phishing" id="gauge-circle" cx="60" cy="60" r="50"></circle>
+                                        </svg>
+                                        <div class="gauge-center-content">
+                                            <span class="gauge-value" id="gauge-score-value">85</span>
+                                            <span class="gauge-sub">/ 100</span>
+                                        </div>
+                                    </div>
+                                    <span class="gauge-caption">Heuristic Risk Score</span>
+                                </div>
+                            </div>
+
+                            <div class="verdict-explanation-box">
+                                <h4 class="explanation-title">Analysis Synthesis:</h4>
+                                <p class="explanation-text" id="verdict-explanation">
+                                    The machine learning model classified this message as Phishing with 92% model probability.
+                                    Heuristic pattern inspection detected 2 suspicious indicators.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: ML Model Confidence Distribution -->
+                        <div class="result-card confidence-card glass-panel" id="card-confidence">
+                            <div class="card-eyebrow">ML Model Confidence Distribution</div>
+                            <p class="confidence-intro">
+                                Probabilistic output from the trained Logistic Regression SMS classifier:
+                            </p>
+                            
+                            <div class="confidence-bars-container">
+                                <!-- Phishing Probability Bar -->
+                                <div class="conf-bar-group">
+                                    <div class="conf-bar-header">
+                                        <span class="conf-label label-phishing">Phishing</span>
+                                        <span class="conf-val" id="conf-val-phishing">0%</span>
+                                    </div>
+                                    <div class="conf-track">
+                                        <div class="conf-fill fill-phishing" id="conf-bar-phishing" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Spam Probability Bar -->
+                                <div class="conf-bar-group">
+                                    <div class="conf-bar-header">
+                                        <span class="conf-label label-spam">Spam</span>
+                                        <span class="conf-val" id="conf-val-spam">0%</span>
+                                    </div>
+                                    <div class="conf-track">
+                                        <div class="conf-fill fill-spam" id="conf-bar-spam" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Legitimate Probability Bar -->
+                                <div class="conf-bar-group">
+                                    <div class="conf-bar-header">
+                                        <span class="conf-label label-legit">Legitimate</span>
+                                        <span class="conf-val" id="conf-val-legit">0%</span>
+                                    </div>
+                                    <div class="conf-track">
+                                        <div class="conf-fill fill-legit" id="conf-bar-legit" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="model-meta-footnote">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                <span>TF-IDF n-gram (1,2) pipeline with balanced class weighting.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Grid: Indicators, URLs, Recommendations, and Model Caveats -->
+                    <div class="results-grid-bottom">
+                        <!-- Card 3: Suspicious Indicators -->
+                        <div class="result-card indicators-card glass-panel" id="card-indicators">
+                            <div class="card-header-with-badge">
+                                <h3 class="card-title">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="12 2 2 22 22 22 12 2"></polygon>
+                                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                    </svg>
+                                    Suspicious Indicators Found
+                                </h3>
+                                <span class="counter-badge" id="indicator-count-badge">0 Found</span>
+                            </div>
+                            <div class="indicators-list" id="indicators-list">
+                                <!-- Populated dynamically by JS -->
+                                <div class="empty-state-notice">No high-risk textual indicators were triggered.</div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: URL Forensic Analysis -->
+                        <div class="result-card urls-card glass-panel" id="card-urls">
+                            <div class="card-header-with-badge">
+                                <h3 class="card-title">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                    </svg>
+                                    URL & Link Forensics
+                                </h3>
+                                <span class="counter-badge" id="url-count-badge">0 Links</span>
+                            </div>
+                            <p class="card-subtext">
+                                Static heuristic inspection of link structures. Links are never fetched or visited automatically.
+                            </p>
+                            <div class="urls-list" id="urls-list">
+                                <!-- Populated dynamically by JS -->
+                                <div class="empty-state-notice">No web links or URLs were detected in this message.</div>
+                            </div>
+                        </div>
+
+                        <!-- Card 5: Safety Action Checklist -->
+                        <div class="result-card recommendations-card glass-panel" id="card-recommendations">
+                            <div class="card-header-with-badge">
+                                <h3 class="card-title">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                    Practical Safety Recommendations
+                                </h3>
+                            </div>
+                            <ul class="recommendations-list" id="recommendations-list">
+                                <!-- Populated dynamically by JS -->
+                            </ul>
+                        </div>
+
+                        <!-- Card 6: AI Transparency & Limitations Banner -->
+                        <div class="result-card transparency-card glass-panel" id="card-transparency">
+                            <div class="card-header-with-badge">
+                                <h3 class="card-title text-cyan">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                    Model Scope & Security Advisory
+                                </h3>
+                            </div>
+                            <div class="transparency-content">
+                                <p>
+                                    <strong>Important Distinction:</strong> PhishShift clearly delineates between the statistical
+                                    <em>Machine Learning prediction</em>, rule-based <em>heuristic indicators</em>, and the composite
+                                    <em>heuristic risk score</em>.
+                                </p>
+                                <div class="advisory-highlight-box">
+                                    <span class="caution-icon">⚠️</span>
+                                    <span>
+                                        <strong>Legitimate does not mean Safe:</strong> A message classified as "Legitimate" reflects
+                                        statistical SMS language similarity only. Sophisticated spear-phishing or newly registered threat
+                                        domains may evade language models. Always independently verify unexpected requests.
+                                    </span>
+                                </div>
+                                <p class="model-scope-text">
+                                    <em>Dataset boundary:</em> The underlying Logistic Regression model was trained on an SMS text dataset.
+                                    It is not trained or validated for email headers, file attachments, or binary malware payloads.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works-section" id="how-it-works">
+            <div class="container">
+                <div class="section-header text-center">
+                    <div class="badge-pill">Three-Tier Architecture</div>
+                    <h2 class="section-title">How PhishShift Analyzes Messages</h2>
+                    <p class="section-description">
+                        Every submission passes through a privacy-preserving pipeline combining statistical AI with
+                        rule-based cyber forensics.
+                    </p>
+                </div>
+
+                <div class="steps-grid">
+                    <!-- Step 1 -->
+                    <div class="step-card glass-panel">
+                        <div class="step-number">01</div>
+                        <div class="step-icon-box">
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                <path d="M7 15h10M7 9h10M7 12h4"></path>
+                            </svg>
+                        </div>
+                        <h3 class="step-title">In-Memory Input Preprocessing</h3>
+                        <p class="step-text">
+                            The user pastes a message into the scanner. Input is sanitized, validated for length limits,
+                            and processed strictly in volatile memory. No text is logged to disk or saved to a database.
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step-card glass-panel">
+                        <div class="step-number">02</div>
+                        <div class="step-icon-box">
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="step-title">ML & Heuristic Dual Analysis</h3>
+                        <p class="step-text">
+                            Sublinear TF-IDF vectorization evaluates word and bi-gram frequencies against a pre-trained
+                            Logistic Regression model. Simultaneously, static forensic rules inspect URL domains, IP addresses,
+                            and urgency keywords without visiting external links.
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-card glass-panel">
+                        <div class="step-number">03</div>
+                        <div class="step-icon-box">
+                            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <path d="m9 12 2 2 4-4"></path>
+                            </svg>
+                        </div>
+                        <h3 class="step-title">Actionable Risk Intelligence</h3>
+                        <p class="step-text">
+                            The application synthesizes model probability, heuristic indicators, and URL flags into an
+                            intuitive 0-100 risk score with tailored defensive steps to protect users from social engineering.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="callout-disclaimer-box">
+                    <span class="callout-icon">💡</span>
+                    <span>
+                        <strong>Note on Probabilistic Systems:</strong> Machine learning predictions can occasionally be inaccurate.
+                        Always use PhishShift as an advisory decision support tool rather than an infallible security oracle.
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Architecture Section -->
+        <section class="architecture-section" id="architecture">
+            <div class="container">
+                <div class="section-header text-center">
+                    <div class="badge-pill">Engineering & Science</div>
+                    <h2 class="section-title">Technical Architecture & Stack</h2>
+                    <p class="section-description">
+                        Built with Python Flask, Scikit-Learn, and lightweight vanilla frontend technologies.
+                    </p>
+                </div>
+
+                <div class="tech-grid">
+                    <div class="tech-card glass-panel">
+                        <div class="tech-header">
+                            <span class="tech-icon">🧠</span>
+                            <h4>Machine Learning Model</h4>
+                        </div>
+                        <ul class="tech-list">
+                            <li><strong>Pipeline:</strong> <code>TfidfVectorizer</code> + <code>LogisticRegression</code></li>
+                            <li><strong>Vectorization:</strong> N-gram range (1, 2), sublinear term frequency, unicode accents stripped</li>
+                            <li><strong>Optimization:</strong> L2 penalty, balanced class weighting, max 30,000 features</li>
+                            <li><strong>Performance:</strong> ~96.66% held-out test accuracy on SMS corpus</li>
+                            <li><strong>Inference:</strong> Loaded once into memory via <code>joblib</code></li>
+                        </ul>
+                    </div>
+
+                    <div class="tech-card glass-panel">
+                        <div class="tech-header">
+                            <span class="tech-icon">🔗</span>
+                            <h4>Modular URL Forensics</h4>
+                        </div>
+                        <ul class="tech-list">
+                            <li><strong>Static Text Analysis:</strong> Inspects host, scheme, and path without network calls</li>
+                            <li><strong>Host Verification:</strong> Flags direct numeric IP addresses and port manipulation</li>
+                            <li><strong>Abuse Detection:</strong> Identifies high-risk TLDs and known URL shortening services</li>
+                            <li><strong>Brand Spoofing:</strong> Detects unauthorized brand names embedded in subdomains</li>
+                            <li><strong>Extensible:</strong> Pluggable architecture ready for VirusTotal / Safe Browsing APIs</li>
+                        </ul>
+                    </div>
+
+                    <div class="tech-card glass-panel">
+                        <div class="tech-header">
+                            <span class="tech-icon">🛡️</span>
+                            <h4>Privacy & Hardened Security</h4>
+                        </div>
+                        <ul class="tech-list">
+                            <li><strong>Zero Retention:</strong> Message contents are strictly ephemeral and never persisted</li>
+                            <li><strong>Sanitized Logging:</strong> Server logs capture character count and status code only</li>
+                            <li><strong>Input Defense:</strong> 10KB message cap, strict JSON validation, client rate limiting</li>
+                            <li><strong>XSS Immunity:</strong> Dynamic DOM rendering uses pure textContent, never raw HTML</li>
+                            <li><strong>Headers:</strong> Enforced CSP, nosniff, DENY frame options, referrer policy</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security & Privacy Section -->
+        <section class="privacy-section" id="privacy">
+            <div class="container">
+                <div class="privacy-card glass-panel">
+                    <div class="privacy-header">
+                        <div class="privacy-icon-box">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <rect x="9" y="9" width="6" height="6" rx="1"></rect>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="privacy-title">Security & Privacy Commitments</h2>
+                            <p class="privacy-subtitle">How PhishShift safeguards your data and enforces responsible analysis.</p>
+                        </div>
+                    </div>
+                    <div class="privacy-body">
+                        <div class="privacy-item">
+                            <h4>1. Ephemeral In-Memory Processing</h4>
+                            <p>Submitted text messages are passed directly into the active ML model and discarded immediately after response synthesis. We do not maintain any message database, search index, or persistent cache.</p>
+                        </div>
+                        <div class="privacy-item">
+                            <h4>2. Zero Network Fetching for URLs</h4>
+                            <p>To eliminate attacker reconnaissance or "canary token" triggers, PhishShift strictly analyzes URL text structure heuristically. It never issues HTTP requests or opens remote websites.</p>
+                        </div>
+                        <div class="privacy-item">
+                            <h4>3. Transparent Threat Limitations</h4>
+                            <p>No machine learning model is 100% foolproof. PhishShift's model is specialized for SMS patterns and should not be used as the sole defense against complex targeted attacks or email attachments.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-container">
+            <div class="footer-left">
+                <div class="footer-brand">
+                    <span class="brand-name">Phish<span class="highlight">Shift</span></span>
+                    <span class="footer-badge">AI Risk Scanner</span>
+                </div>
+                <p class="footer-desc">
+                    An open AI-driven cybersecurity prototype for detecting phishing, spam, and deceptive communication.
+                </p>
+                <p class="footer-copyright">
+                    © 2026 PhishShift. Designed for defensive cybersecurity research and message risk awareness.
+                </p>
+            </div>
+            <div class="footer-right">
+                <div class="footer-links-group">
+                    <h5 class="footer-heading">Navigation</h5>
+                    <a href="#home">Home</a>
+                    <a href="#scanner">Scanner</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#architecture">Architecture</a>
+                </div>
+                <div class="footer-links-group">
+                    <h5 class="footer-heading">Endpoints</h5>
+                    <a href="/api/health" target="_blank" rel="noopener">Health API (GET)</a>
+                    <a href="#scanner">Scan API (POST)</a>
+                    <a href="#privacy">Privacy Notice</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

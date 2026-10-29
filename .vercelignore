@@ -1,0 +1,10 @@
+.git
+.pytest_cache
+tests
+__pycache__
+*.pyc
+*.pyo
+phishshift_3class (2).joblib
+.env*
+.venv
+venv

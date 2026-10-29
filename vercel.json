@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py"
+    }
+  ],
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "templates/**,static/**,phishshift_3class.joblib",
+      "excludeFiles": "{tests/**,phishshift_3class (2).joblib}"
+    }
+  }
+}
